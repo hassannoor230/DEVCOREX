@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { API_BASE } from '../utils/apiBase'
 
 export default function Contact() {
   const ref = useRef(null)
@@ -10,7 +11,7 @@ export default function Contact() {
   const [settings, setSettings] = useState(null)
 
   useEffect(() => {
-    fetch('/api/settings', { headers: { 'Content-Type': 'application/json' } })
+    fetch(`${API_BASE}/settings`, { headers: { 'Content-Type': 'application/json' } })
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => setSettings(data))
       .catch(() => {})
@@ -39,7 +40,7 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/contacts', {
+      const res = await fetch(`${API_BASE}/contacts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
