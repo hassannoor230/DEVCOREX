@@ -47,7 +47,7 @@ export default function Team() {
   const [team, setTeam] = useState(staticTeam)
 
   useEffect(() => {
-    fetch(`${API_BASE}/team`, { headers: { 'Content-Type': 'application/json' } })
+    fetch(`${API_BASE}/team`)
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {

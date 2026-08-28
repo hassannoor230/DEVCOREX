@@ -82,7 +82,7 @@ export default function Portfolio() {
   const [projects, setProjects] = useState(staticProjects)
 
   useEffect(() => {
-    fetch(`${API_BASE}/projects`, { headers: { 'Content-Type': 'application/json' } })
+    fetch(`${API_BASE}/projects`)
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {

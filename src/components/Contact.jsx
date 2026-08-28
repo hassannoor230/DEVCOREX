@@ -11,7 +11,7 @@ export default function Contact() {
   const [settings, setSettings] = useState(null)
 
   useEffect(() => {
-    fetch(`${API_BASE}/settings`, { headers: { 'Content-Type': 'application/json' } })
+    fetch(`${API_BASE}/settings`)
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => setSettings(data))
       .catch(() => {})
