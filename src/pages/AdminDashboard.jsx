@@ -207,7 +207,7 @@ export default function AdminDashboard({ user, onLogout }) {
             fontSize: '0.6rem',
             color: 'var(--gold)',
             letterSpacing: '0.1em',
-          }}>{user.email}</p>
+          }}>{user?.email || 'Admin account'}</p>
         </div>
 
         <nav style={{ flex: 1, padding: '1.5rem 0' }}>
