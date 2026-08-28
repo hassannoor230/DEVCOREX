@@ -24,7 +24,7 @@ const emptyMember = {
 }
 
 export default function AdminDashboard({ user, onLogout }) {
-  const [tab, setTab] = useState('projects')
+  const [tab, setTab] = useState('dashboard')
   const [projects, setProjects] = useState([])
   const [contacts, setContacts] = useState([])
   const [team, setTeam] = useState([])
@@ -169,6 +169,7 @@ export default function AdminDashboard({ user, onLogout }) {
   }
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard' },
     { id: 'projects', label: 'Projects' },
     { id: 'contacts', label: 'Contacts' },
     { id: 'team', label: 'Team' },
@@ -265,6 +266,14 @@ export default function AdminDashboard({ user, onLogout }) {
           <div style={{ color: 'var(--gold)', textAlign: 'center', padding: '4rem' }}>Loading...</div>
         ) : (
           <>
+            {tab === 'dashboard' && (
+              <DashboardOverview
+                projects={projects}
+                contacts={contacts}
+                team={team}
+              />
+            )}
+
             {tab === 'projects' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -646,4 +655,117 @@ const btnSmall = {
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
   cursor: 'pointer',
+}
+
+const isNew = (date) => {
+  if (!date) return false
+  const diff = Date.now() - new Date(date).getTime()
+  return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000
+}
+
+const recentOf = (items, n = 5) =>
+  [...items]
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, n)
+
+function StatCard({ label, value, sub }) {
+  return (
+    <div style={{
+      padding: '1.4rem',
+      border: '1px solid rgba(201,168,76,0.12)',
+      background: 'var(--dark-2)',
+    }}>
+      <div style={{ fontFamily: 'Cormorant Garamond', fontSize: '2.4rem', color: 'var(--gold)', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontFamily: 'Space Mono', fontSize: '0.62rem', color: 'var(--white-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '0.5rem' }}>{label}</div>
+      {sub && <div style={{ fontFamily: 'Space Mono', fontSize: '0.6rem', color: 'rgba(201,168,76,0.5)', marginTop: '0.3rem' }}>{sub}</div>}
+    </div>
+  )
+}
+
+function RecentList({ title, items, render }) {
+  return (
+    <div style={{ border: '1px solid rgba(201,168,76,0.1)', background: 'var(--dark-2)' }}>
+      <div style={{ padding: '1rem 1.2rem', borderBottom: '1px solid rgba(201,168,76,0.08)', fontFamily: 'Cormorant Garamond', fontSize: '1.2rem', color: 'var(--white)' }}>{title}</div>
+      <div style={{ display: 'grid', gap: '0.5rem', padding: '0.8rem' }}>
+        {items.length === 0 && (
+          <div style={{ color: 'var(--white-dim)', fontSize: '0.8rem', textAlign: 'center', padding: '1rem' }}>Nothing added yet</div>
+        )}
+        {items.map((it) => render(it))}
+      </div>
+    </div>
+  )
+}
+
+function DashboardOverview({ projects, contacts, team }) {
+  const featured = team.filter((m) => m.featured).length
+  const recentProjects = recentOf(projects)
+  const recentTeam = recentOf(team)
+  const recentContacts = recentOf(contacts)
+
+  return (
+    <div>
+      <h2 style={{ fontFamily: 'Cormorant Garamond', fontSize: '1.8rem', color: 'var(--white)', marginBottom: '1.5rem' }}>Dashboard</h2>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <StatCard label="Projects" value={projects.length} sub="total added" />
+        <StatCard label="Contacts" value={contacts.length} sub="received" />
+        <StatCard label="Team Members" value={team.length} sub="total added" />
+        <StatCard label="Featured" value={featured} sub="on homepage" />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+        <RecentList
+          title="Recently Added Projects"
+          items={recentProjects}
+          render={(p) => (
+            <div key={p._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', border: '1px solid rgba(201,168,76,0.08)' }}>
+              <div>
+                <div style={{ fontFamily: 'Cormorant Garamond', fontSize: '1rem', color: 'var(--white)' }}>{p.title}</div>
+                <div style={{ fontFamily: 'Space Mono', fontSize: '0.58rem', color: 'var(--gold)' }}>{p.category} • {p.year}</div>
+              </div>
+              {isNew(p.createdAt) && <span style={badgeStyle}>NEW</span>}
+            </div>
+          )}
+        />
+
+        <RecentList
+          title="Recently Added Team"
+          items={recentTeam}
+          render={(m) => (
+            <div key={m._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', border: '1px solid rgba(201,168,76,0.08)' }}>
+              <div>
+                <div style={{ fontFamily: 'Cormorant Garamond', fontSize: '1rem', color: 'var(--white)' }}>{m.name}</div>
+                <div style={{ fontFamily: 'Space Mono', fontSize: '0.58rem', color: 'var(--gold)' }}>{m.role}{m.featured ? ' • Featured' : ''}</div>
+              </div>
+              {isNew(m.createdAt) && <span style={badgeStyle}>NEW</span>}
+            </div>
+          )}
+        />
+
+        <RecentList
+          title="Recently Received Contacts"
+          items={recentContacts}
+          render={(c) => (
+            <div key={c._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', border: '1px solid rgba(201,168,76,0.08)' }}>
+              <div>
+                <div style={{ fontFamily: 'Cormorant Garamond', fontSize: '1rem', color: 'var(--white)' }}>{c.name}</div>
+                <div style={{ fontFamily: 'Space Mono', fontSize: '0.58rem', color: 'var(--gold)' }}>{c.email}</div>
+              </div>
+              {isNew(c.createdAt) && <span style={badgeStyle}>NEW</span>}
+            </div>
+          )}
+        />
+      </div>
+    </div>
+  )
+}
+
+const badgeStyle = {
+  padding: '0.2rem 0.5rem',
+  background: 'rgba(201,168,76,0.12)',
+  border: '1px solid rgba(201,168,76,0.3)',
+  color: 'var(--gold)',
+  fontFamily: 'Space Mono',
+  fontSize: '0.55rem',
+  letterSpacing: '0.1em',
 }
