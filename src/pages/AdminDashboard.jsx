@@ -176,6 +176,14 @@ export default function AdminDashboard({ user, onLogout }) {
     { id: 'settings', label: 'Settings' },
   ]
 
+  if (!user) {
+    return (
+      <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: 'var(--dark)', color: 'var(--gold)', fontFamily: 'Space Mono', fontSize: '0.8rem', letterSpacing: '0.1em' }}>
+        LOADING...
+      </div>
+    )
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--dark)' }}>
       {/* Sidebar */}
