@@ -168,6 +168,21 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   }
 
+  const handleDeleteSetting = async (key) => {
+    if (!confirm(`Delete the \"${key}\" setting?`)) return
+    try {
+      await api.deleteSetting(key)
+      setSettings(current => {
+        const updated = { ...current }
+        delete updated[key]
+        return updated
+      })
+      showMessage('success', 'Setting deleted')
+    } catch (err) {
+      showMessage('error', err.message)
+    }
+  }
+
   const tabs = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'projects', label: 'Projects' },
@@ -543,6 +558,23 @@ export default function AdminDashboard({ user, onLogout }) {
             {tab === 'settings' && (
               <div>
                 <h2 style={{ fontFamily: 'Cormorant Garamond', fontSize: '1.8rem', color: 'var(--white)', marginBottom: '1.5rem' }}>Website Settings</h2>
+                <div style={{ display: 'grid', gap: '0.8rem', marginBottom: '1.5rem', maxWidth: 600 }}>
+                  {Object.entries(settings).map(([key, value]) => (
+                    <div key={key} style={{ padding: '0.9rem 1rem', border: '1px solid rgba(201,168,76,0.12)', background: 'var(--dark-2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontFamily: 'Space Mono', fontSize: '0.62rem', color: 'var(--gold)', marginBottom: '0.25rem' }}>{key}</div>
+                        <input
+                          aria-label={`Value for ${key}`}
+                          value={String(value)}
+                          onChange={e => setSettings({ ...settings, [key]: e.target.value })}
+                          style={{ ...inputStyle, padding: '0.45rem 0.6rem', fontSize: '0.75rem' }}
+                        />
+                      </div>
+                      <button onClick={() => handleDeleteSetting(key)} style={{ ...btnSmall, background: 'rgba(220,38,38,0.1)', borderColor: 'rgba(220,38,38,0.3)', color: '#fca5a5', flexShrink: 0 }}>Delete</button>
+                    </div>
+                  ))}
+                  {Object.keys(settings).length === 0 && <div style={{ color: 'var(--white-dim)', textAlign: 'center', padding: '1rem' }}>No settings saved yet</div>}
+                </div>
                 <form onSubmit={handleSaveSettings} style={{
                   padding: '1.5rem',
                   border: '1px solid rgba(201,168,76,0.15)',

@@ -149,4 +149,14 @@ export const api = {
     if (!res.ok) throw new Error(data.message || 'Failed to update settings')
     return data
   },
+
+  deleteSetting: async (key) => {
+    const res = await fetch(`${API_BASE}/settings/${encodeURIComponent(key)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Failed to delete setting')
+    return data
+  },
 }
