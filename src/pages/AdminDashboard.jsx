@@ -706,8 +706,6 @@ function RecentList({ title, items, render }) {
 
 function DashboardOverview({ projects, contacts, team }) {
   const featured = team.filter((m) => m.featured).length
-  const recentProjects = recentOf(projects)
-  const recentTeam = recentOf(team)
   const recentContacts = recentOf(contacts)
 
   return (
@@ -723,8 +721,8 @@ function DashboardOverview({ projects, contacts, team }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
         <RecentList
-          title="Recently Added Projects"
-          items={recentProjects}
+          title={`Projects (${projects.length})`}
+          items={projects}
           render={(p) => (
             <div key={p._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', border: '1px solid rgba(201,168,76,0.08)' }}>
               <div>
@@ -737,8 +735,8 @@ function DashboardOverview({ projects, contacts, team }) {
         />
 
         <RecentList
-          title="Recently Added Team"
-          items={recentTeam}
+          title={`Team Members (${team.length})`}
+          items={team}
           render={(m) => (
             <div key={m._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.8rem', border: '1px solid rgba(201,168,76,0.08)' }}>
               <div>
